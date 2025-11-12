@@ -1,6 +1,5 @@
 import requests
 
-
 def get_pubg_name_from_midas(player_id: str):
     """يجلب الاسم الحقيقي من موقع ميداس الرسمي"""
     url = "https://www.midasbuy.com/ot/api/v1/pubgm/checkPlayer"
@@ -13,6 +12,8 @@ def get_pubg_name_from_midas(player_id: str):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         "Accept-Language": "en-US,en;q=0.9",
+        "Origin": "https://www.midasbuy.com",
+        "Referer": "https://www.midasbuy.com/",
     }
 
     try:
