@@ -1,8 +1,15 @@
 import requests
 
 def get_pubg_name_from_midas(player_id: str):
-    """يجلب الاسم الحقيقي من موقع ميداس الرسمي"""
-    url = "https://www.midasbuy.com/ot/api/v1/pubgm/checkPlayer"
+    """يجلب الاسم الحقيقي من موقع ميداس الرسمي أو من مصدر احتياطي"""
+    
+    # قائمة الروابط الممكنة (الأصلي + الاحتياطي)
+    urls = [
+        "https://www.midasbuy.com/ot/api/v1/pubgm/checkPlayer",   # الرئيسي
+        "https://www.midasbuy.com/ot/api/v1/player/checkPlayer"   # الاحتياطي
+    ]
+
+    # نفس البينات المطلوبة في كل API
     payload = {
         "appId": "1450015065",
         "playerId": str(player_id),
@@ -16,19 +23,32 @@ def get_pubg_name_from_midas(player_id: str):
         "Referer": "https://www.midasbuy.com/",
     }
 
-    try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("code") == "SUCCESS":
-                return {
-                    "success": True,
-                    "name": data["data"]["roleName"],
-                    "id": data["data"]["roleId"],
-                }
+    # نحاول مع كل رابط بالتتابع
+    for url in urls:
+        try:
+            response = requests.post(url, json=payload, headers=headers, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("code") == "SUCCESS":
+                    return {
+                        "success": True,
+                        "name": data["data"]["roleName"],
+                        "id": data["data"]["roleId"],
+                        "source": url
+                    }
+                else:
+                    # إذا الرد فشل من السيرفر، نجرب الرابط التالي
+                    continue
             else:
-                return {"success": False, "error": data.get("msg", "Unknown error")}
-        else:
-            return {"success": False, "error": f"HTTP {response.status_code}"}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+                # إذا كود HTTP غير 200، نجرب الرابط التالي
+                continue
+
+        except Exception as e:
+            # إذا حصلت مشكلة بالاتصال ننتقل للرابط التالي
+            continue
+
+    # إذا فشل جميع الروابط
+    return {
+        "success": False,
+        "error": "تعذر الوصول إلى بيانات اللاعب حالياً — أعد المحاولة لاحقاً.",
+    }
