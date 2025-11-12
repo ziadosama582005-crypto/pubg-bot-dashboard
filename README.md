@@ -1,0 +1,2 @@
+# pubg-bot-dashboard
+اسماء
