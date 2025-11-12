@@ -5,11 +5,11 @@ def get_pubg_name_from_midas(player_id: str):
     
     # قائمة الروابط الممكنة (الأصلي + الاحتياطي)
     urls = [
-        "https://www.midasbuy.com/ot/api/v1/pubgm/checkPlayer",   # الرئيسي
-        "https://www.midasbuy.com/ot/api/v1/player/checkPlayer"   # الاحتياطي
+        "https://corsproxy.io/?" + "https://www.midasbuy.com/ot/api/v1/pubgm/checkPlayer",
+        "https://corsproxy.io/?" + "https://www.midasbuy.com/ot/api/v1/player/checkPlayer"
     ]
 
-    # نفس البينات المطلوبة في كل API
+    # نفس البيانات المطلوبة في كل API
     payload = {
         "appId": "1450015065",
         "playerId": str(player_id),
