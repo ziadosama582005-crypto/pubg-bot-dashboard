@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>PUBG Name Finder Dashboard</title>
+  <style>
+    body { background:#0f172a; color:white; font-family:Arial; text-align:center; padding:40px; }
+    input { padding:10px; font-size:18px; border-radius:8px; border:none; width:250px; text-align:center; }
+    button { padding:10px 20px; font-size:18px; border:none; background:#22c55e; color:white; border-radius:8px; cursor:pointer; }
+    button:hover { background:#16a34a; }
+    .result { margin-top:30px; background:#1e293b; padding:20px; border-radius:12px; display:inline-block; }
+  </style>
+</head>
+<body>
+  <h1>🎮 Dashboard فحص أسماء لاعبي PUBG</h1>
+  <input type="text" id="playerId" placeholder="أدخل Player ID">
+  <button onclick="checkPlayer()">تحقق</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function checkPlayer() {
+      const playerId = document.getElementById("playerId").value.trim();
+      const resultDiv = document.getElementById("result");
+      if (!playerId) return resultDiv.innerHTML = "<p>⚠️ الرجاء إدخال Player ID.</p>";
+
+      resultDiv.innerHTML = "<p>🔍 جاري البحث عن اللاعب...</p>";
+
+      try {
+        const response = await fetch("/api/getname", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ player_id: playerId })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <div class='result'>
+              <h3>✅ تم العثور على اللاعب!</h3>
+              <p>👤 الاسم: ${data.name}</p>
+              <p>🆔 Player ID: ${data.id}</p>
+            </div>`;
+        } else {
+          resultDiv.innerHTML = `
+            <div class='result'>
+              <h3>⚠️ لم يتم العثور على اللاعب</h3>
+              <p>${data.error}</p>
+            </div>`;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<p>🚨 فشل الاتصال: ${err.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
